@@ -323,18 +323,17 @@ function readJson(json) {
 const oldSuppressWarning = process.env.SUPPRESS_NO_CONFIG_WARNING
 process.env.SUPPRESS_NO_CONFIG_WARNING = 1
 const config = tryRequire('config')
-if (config && config.has(argv[configValueArg])) {
-  const db = config.get(argv[configValueArg])
-  readJson(db)
-}
-process.env.SUPPRESS_NO_CONFIG_WARNING = oldSuppressWarning
 
 const configFileName = argv[configFileArg]
 if (configFileName) {
   // eslint-disable-next-line global-require,import/no-dynamic-require,security/detect-non-literal-require
   const jsonConfig = require(path.resolve(configFileName))
-  readJson(jsonConfig)
+  readJson(jsonConfig.db || jsonConfig)
+} else if (config && config.has(argv[configValueArg])) {
+  const db = config.get(argv[configValueArg])
+  readJson(db)
 }
+process.env.SUPPRESS_NO_CONFIG_WARNING = oldSuppressWarning
 readTsconfig()
 
 const action = argv._.shift()
